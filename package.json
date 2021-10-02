@@ -21,6 +21,7 @@
     "mongoose": "^5.13.7",
     "mongoose-delete": "^0.5.3",
     "mongoose-slug-generator": "^1.0.4",
+    "morgan": "^1.10.0",
     "passport": "^0.4.1",
     "passport-facebook-token": "^4.0.0",
     "passport-google-plus-token": "^2.1.0",
@@ -29,7 +30,6 @@
     "validator": "^13.6.0"
   },
   "devDependencies": {
-    "morgan": "^1.10.0",
     "nodemon": "^2.0.12"
   }
 }
