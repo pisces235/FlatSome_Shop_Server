@@ -26,11 +26,11 @@ const Order = mongoose.Schema({
         type: Array,
         required: true,
     },
-    comfirm: { 
+    confirm: { 
         type:Boolean,
         default: false,
     },
-    paid: { 
+    payment: { 
         type:Boolean,
         default: false,
     },
