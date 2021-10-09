@@ -70,6 +70,21 @@ const trashProduct = async (req, res, next) => {
             return res.status(400).json({ error: error })
         })
 }
+//[PUT]
+const removeQuantity = async (req, res, next) => {
+    const cart = req.body
+
+    const products = await Product.find({})
+    
+    products.forEach((p) => {
+        cart.forEach((c) => {
+            if(c.product.slug == p.slug) {
+                p.stock -= c.quantity
+                p.save()
+            }
+        })
+    })
+}
 // [PATCH]
 const restoreProduct = async (req, res, next) => {
     Product.restore({ slug: req.params.slug })
@@ -108,6 +123,7 @@ module.exports = {
     newProduct,
     newProducts,
     trashProduct,
-    updateProduct,
+    removeQuantity,
     restoreProduct,
+    updateProduct,
 }

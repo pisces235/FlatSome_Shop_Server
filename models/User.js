@@ -35,6 +35,9 @@ const UserSchema = mongoose.Schema({
     typeAccount: { type: String, default: 'customer' },
     address: Array,
     orders: Array,
+    phoneNumber: {
+        type: String,
+    }
 }, { timestamps: true })
 
 UserSchema.pre('save', async function(next) {

@@ -11,6 +11,7 @@ const app = express()
 
 const userRoute = require('./routes/user')
 const productRoute = require('./routes/product')
+const orderRoute = require('./routes/order')
 
 // Middlewares
 app.use(cors())
@@ -18,8 +19,9 @@ app.use(logger('dev'))
 app.use(express.json())
 
 // Routes
-app.use('/users', userRoute)
+app.use('/orders', orderRoute)
 app.use('/products', productRoute)
+app.use('/users', userRoute)
 
 // Catch 404 Errors and forward them to error handlers
 app.use((req, res, next) => {

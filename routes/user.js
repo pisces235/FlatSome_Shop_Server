@@ -42,8 +42,9 @@ router.route('/:userID')
     )
     .patch(
         validateParam(schemas.idSchema, 'userID'),
-        validateBody(schemas.userOptionalSchema),
         UserController.updateUser
     )
+router.route('/edit/billing-address')
+        .patch(UserController.updateUserAddress)
 
 module.exports = router

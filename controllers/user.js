@@ -1,6 +1,7 @@
 const User = require('../models/User')
 
 const JWT = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
 const encodedToken = (userID) => {
     return JWT.sign({
@@ -30,7 +31,7 @@ const authFacebook = async (req, res, next) => {
 const getUser = async (req, res, next) => {
     const { userID } = req.value.params
 
-    const user = await User.findById(userID)
+    let user = await User.findById(userID)
 
     return res.status(200).json(user)
 }
@@ -89,7 +90,7 @@ const signup = async (req, res, next) => {
     // check if there is a user with the same user
     const foundUser = await User.findOne({ email: email })
     if (foundUser)
-        return res.status(403).json({ error: { message: 'Email is already in use.' } })
+        return res.status(200).json({ message: 'Email is already in use.' })
 
     const newUser = new User({ name, email, password })
 
@@ -100,15 +101,55 @@ const signup = async (req, res, next) => {
 
     res.setHeader('Authorization', token)
 
-    return res.status(200).json({ success: true })
+    return res.status(200).json({ message: true })
 }
 
 const updateUser = async (req, res, next) => {
     const { userID } = req.params
+    console.log(req.body)
+    let user = await User.findById(userID)
 
-    const newUser = req.body
+    user.name = req.body.name
+    user.email = req.body.email
 
-    await user.findByIdAndUpdate(userID, newUser)
+    if(req.body.currentPassword != "" && req.body.password != "") {
+        const isSamePassword = await user.isValidPassword(req.body.currentPassword)
+        if(isSamePassword) {
+            try {
+                user.password = req.body.password
+                
+                console.log(user)
+                await user.save()
+    
+                return res.status(200).json({ success: true })
+            } catch (error) {
+                return res.status(200).json({ success: "We can not update your account, please try again later!" })
+            }
+        } else {
+            return res.status(200).json({ success: "The current password is wrong!" })
+        }
+    } else {
+        try {
+            
+            console.log(user)
+            await user.save()
+
+            return res.status(200).json({ success: true })
+        } catch (error) {
+            return res.status(200).json({ success: "We can not update your account, please try again later!" })
+        }
+    }
+}
+
+const updateUserAddress = async (req, res, next) => {
+    let user = await User.findOne({email: req.body.email})
+
+    user.name = req.body.name
+    user.phoneNumber = req.body.phoneNumber
+    user.address = req.body.newAddress
+    console.log(user)
+
+    user.save()
 
     return res.status(200).json({ success: true })
 }
@@ -124,5 +165,6 @@ module.exports = {
     secret,
     signin,
     signup,
-    updateUser
+    updateUser,
+    updateUserAddress
 }
