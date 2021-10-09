@@ -8,12 +8,9 @@ router.route('/')
     .get(OrderController.index)
     .post(OrderController.newOrder)
 
-router.route('/:slug')
-    .get(OrderController.getOrder)
-    .put(OrderController.updateOrder)
-    .patch(OrderController.restoreOrder)
-    .delete(OrderController.trashOrder)
-router.route('/:slug/force')
-    .delete(OrderController.deleteOrder)
+router.route('/:id/confirm-order')
+    .patch(OrderController.confirmOrder)
+router.route('/:id/confirm-payment')
+    .patch(OrderController.confirmPayment)
 
 module.exports = router

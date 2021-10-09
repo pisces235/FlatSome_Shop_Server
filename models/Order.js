@@ -34,6 +34,10 @@ const Order = mongoose.Schema({
         type:Boolean,
         default: false,
     },
+    paymentDate: {
+        type: String,
+        default: '',
+    },
     total: { 
         type: Number, 
         required:true

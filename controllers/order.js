@@ -1,33 +1,7 @@
 const Order = require('../models/Order')
 const User = require('../models/User')
 
-// [DELETE]
-const deleteOrder = async (req, res, next) => {
-    Order.deleteOne({ slug: req.params.slug })
-        .then(() => {
-            res.status(200).json({ success: true })
-        }).catch((error) => {
-            return res.status(400).json({ error: error })
-        })
-}
-// [DELETE]
-const deletedOrders = async (req, res, next) => {
-    try {
-        const orders = await Order.findDeleted()
 
-        return res.status(200).json(orders)
-    } catch (error) {
-        return res.status(400).json({ error: error })
-    }
-}
-// [GET]
-const getOrder = async (req, res, next) => {
-    const { slug } = req.params
-
-    const order = await Order.findOne({ slug: slug })
-
-    return res.status(200).json(order)
-}
 // [GET]
 const index = async (req, res, next) => {
     const orders = await Order.find({})
@@ -38,7 +12,6 @@ const index = async (req, res, next) => {
 const newOrder = async (req, res, next) => {
     try {
         const newOrder = new Order(req.body)
-        console.log(newOrder)
 
         let user = await User.findOne({ email: newOrder.email })
         let count = 0
@@ -71,67 +44,86 @@ const newOrder = async (req, res, next) => {
         return res.status(400).json({ error: error })
     }
 }
-// [GET]
-const newOrders = async (req, res, next) => {
+// [PATCH]
+const confirmOrder = async (req, res, next) => {
+    const { id } = req.params
+
+    let order = await Order.findById(id)
+    order.confirm = true
+
+    let user = await User.findOne({email: order.email})
+
+    if(user) {
+        for(var i = 0; i < user.orders.length; i++) {
+            if(user.orders[i]._id == id) {
+                user.orders[i] = order
+            }
+        }
+        await User.updateOne({ email: order.email }, user);
+    }
+    
     try {
-        let orders = await Order.find({})
-
-        const newOrders = orders.reverse()
-
-        return res.status(200).json(newOrders)
+        await order.save()
+        return res.status(200).json({success: true})
     } catch (error) {
         console.log(error)
         return res.status(400).json({ error: error })
     }
 }
-// [DELETE]
-const trashOrder = async (req, res, next) => {
-    Order.delete({ slug: req.params.slug })
-        .then(() => {
-            res.status(200).json({ success: true })
-        }).catch((error) => {
-            return res.status(400).json({ error: error })
-        })
-}
+
 // [PATCH]
-const restoreOrder = async (req, res, next) => {
-    Order.restore({ slug: req.params.slug })
-        .then(() => {
-            res.status(200).json({ success: true })
-        }).catch((error) => {
-            return res.status(400).json({ error: error })
-        })
-}
-// [PUT]
-const updateOrder = async (req, res, next) => {
-    const { slug } = req.params
+const confirmPayment = async (req, res, next) => {
+    const { id } = req.params
 
-    let newOrder = req.body
+    let order = await Order.findById(id)
+    let date = new Date()
+    let day = date.getDate()
+    let indexMonth = date.getMonth()
+    let year = date.getFullYear()
+    let month = [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+    ]
+    let paymentDate = day + "/" + month[indexMonth] + "/" + year
+    order.confirm = true
+    order.payment = true
+    order.paymentDate = paymentDate
+    console.log(order)
 
+    let user = await User.findOne({email: order.email})
 
-    s = newOrder.categories.toString().split(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/ ]/gi)
-    var filtered = s.filter(function (el) {
-        return el != "";
-    });
-    Order.updateOne({ slug: slug }, {
-        ...newOrder,
-        categories: filtered
-    }).then(() => {
-        return res.status(200).json({ success: true })
-    }).catch((error) => {
+    if(user) {
+        for(var i = 0; i < user.orders.length; i++) {
+            if(user.orders[i]._id == id) {
+                user.orders[i] = order
+            }
+        }
+        await User.updateOne({ email: order.email }, user);
+    }
+    
+    try {
+        await order.save()
+        return res.status(200).json({success: true})
+    } catch (error) {
+        console.log(error)
         return res.status(400).json({ error: error })
-    })
+    }
 }
 
 module.exports = {
-    deleteOrder,
-    deletedOrders,
-    getOrder,
     index,
     newOrder,
-    newOrders,
-    trashOrder,
-    updateOrder,
-    restoreOrder,
+    confirmOrder,
+    confirmPayment,
 }
 

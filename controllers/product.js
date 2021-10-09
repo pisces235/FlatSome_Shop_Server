@@ -80,6 +80,7 @@ const removeQuantity = async (req, res, next) => {
         cart.forEach((c) => {
             if(c.product.slug == p.slug) {
                 p.stock -= c.quantity
+                p.sold += c.quantity
                 p.save()
             }
         })
