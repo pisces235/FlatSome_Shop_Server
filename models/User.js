@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const { isEmail } = require('validator')
 
 const bcrypt = require('bcryptjs')
+const SALT_WORK_FACTOR = 10;
 
 const UserSchema = mongoose.Schema({
     name: {
@@ -40,29 +41,20 @@ const UserSchema = mongoose.Schema({
     }
 }, { timestamps: true })
 
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function save(next) {
+    if (!this.isModified('password')) return next();
     try {
-        if(this.authType != 'local') next()
-        // generate a salt
-        const salt = await bcrypt.genSalt(10)
-        // generate a password hash (salt + hash)
-        const hashPassword = await bcrypt.hash(this.password, salt)
-        // Re-assign password hashed
-        this.password = hashPassword
-
-        next()
-    } catch (error) {
-        next(error)
+      const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+      this.password = await bcrypt.hash(this.password, salt);
+      return next();
+    } catch (err) {
+      return next(err);
     }
-})
+  });
 
-UserSchema.methods.isValidPassword = async function(newPassword) {
-    try {
-        return await bcrypt.compare(newPassword, this.password)
-    } catch (error) {
-        throw new Error(error)
-    }
-}
+UserSchema.methods.isValidPassword = async function validatePassword(data) {
+    return bcrypt.compare(data, this.password);
+  };
 
 
 module.exports = User = mongoose.model('User', UserSchema)
