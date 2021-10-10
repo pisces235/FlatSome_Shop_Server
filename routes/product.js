@@ -13,9 +13,6 @@ router.route('/deletedProducts')
 router.route('/newproducts')
     .get(ProductController.newProducts)
 
-router.route('/removeQuantity')
-    .put(ProductController.removeQuantity)
-
 router.route('/:slug')
     .get(ProductController.getProduct)
     .put(ProductController.updateProduct)

@@ -1,6 +1,6 @@
 const Order = require('../models/Order')
 const User = require('../models/User')
-
+const Product = require('../models/Product')
 
 // [GET]
 const index = async (req, res, next) => {
@@ -12,6 +12,14 @@ const index = async (req, res, next) => {
 const newOrder = async (req, res, next) => {
     try {
         const newOrder = new Order(req.body)
+
+        newOrder.cart.forEach(async c => {
+            let product = await Product.findById(c.product._id)
+
+            product.stock -= c.quantity
+            product.sold += c.quantity
+            await product.save()
+        })
 
         let user = await User.findOne({ email: newOrder.email })
         let count = 0
