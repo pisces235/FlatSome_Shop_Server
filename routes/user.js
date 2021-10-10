@@ -45,6 +45,8 @@ router.route('/:userID')
         UserController.updateUser
     )
 router.route('/edit/billing-address')
-        .patch(UserController.updateUserAddress)
+    .patch(UserController.updateUserAddress)
+router.route('/:id/change-password')
+    .patch(UserController.changePassword)
 
 module.exports = router

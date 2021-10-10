@@ -8,6 +8,8 @@ router.route('/')
     .get(OrderController.index)
     .post(OrderController.newOrder)
 
+router.route('/delete/:id/:email')
+    .delete(OrderController.deleteOrder)
 router.route('/:id/confirm-order')
     .patch(OrderController.confirmOrder)
 router.route('/:id/confirm-payment')

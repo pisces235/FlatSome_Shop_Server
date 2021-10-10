@@ -2,56 +2,22 @@ const Order = require('../models/Order')
 const User = require('../models/User')
 const Product = require('../models/Product')
 
-// [GET]
-const index = async (req, res, next) => {
-    const orders = await Order.find({})
-
-    return res.status(200).json(orders)
-}
-// [POST]
-const newOrder = async (req, res, next) => {
-    try {
-        const newOrder = new Order(req.body)
-
-        newOrder.cart.forEach(async c => {
-            let product = await Product.findById(c.product._id)
-
-            product.stock -= c.quantity
-            product.sold += c.quantity
-            await product.save()
-        })
-
-        let user = await User.findOne({ email: newOrder.email })
-        let count = 0
-
-        if (user) {
-            user.address.forEach((a) => {
-                if(a !== newOrder.address) {
-                    count++;
-                }
-            })
-            if(count == user.address.length) {
-                user.address = [];
-                user.address.push({
-                    ...newOrder.address,
-                    phoneNumber: newOrder.phoneNumber,
-                    name: newOrder.name
-                })
-            }
-            user.orders.push(newOrder)
-            user.phoneNumber = newOrder.phoneNumber
-
-            user.save()
+//[DELETE]
+const deleteOrder = async (req, res, next) => {
+    const { id, email } = req.params
+    console.log(email)
+    let user = await User.findOne({ email: email })
+    for(var i = 0; i < user.orders.length; i++) {
+        if(user.orders[i]._id == id) {
+            user.orders.splice(i, 1)
         }
-
-        await newOrder.save()
-
-        return res.status(201).json({ order: newOrder })
-    } catch (error) {
-        console.log(error)
-        return res.status(400).json({ error: error })
     }
+
+    await Order.deleteOne({_id: id})
+
+    return res.status(200).json({success: true})
 }
+
 // [PATCH]
 const confirmOrder = async (req, res, next) => {
     const { id } = req.params
@@ -128,10 +94,62 @@ const confirmPayment = async (req, res, next) => {
     }
 }
 
+// [GET]
+const index = async (req, res, next) => {
+    const orders = await Order.find({})
+
+    return res.status(200).json(orders)
+}
+// [POST]
+const newOrder = async (req, res, next) => {
+    try {
+        const newOrder = new Order(req.body)
+
+        newOrder.cart.forEach(async c => {
+            let product = await Product.findById(c.product._id)
+
+            product.stock -= c.quantity
+            product.sold += c.quantity
+            await product.save()
+        })
+
+        let user = await User.findOne({ email: newOrder.email })
+        let count = 0
+
+        if (user) {
+            user.address.forEach((a) => {
+                if(a !== newOrder.address) {
+                    count++;
+                }
+            })
+            if(count == user.address.length) {
+                user.address = [];
+                user.address.push({
+                    ...newOrder.address,
+                    phoneNumber: newOrder.phoneNumber,
+                    name: newOrder.name
+                })
+            }
+            user.orders.push(newOrder)
+            user.phoneNumber = newOrder.phoneNumber
+
+            user.save()
+        }
+
+        await newOrder.save()
+
+        return res.status(201).json({ order: newOrder })
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({ error: error })
+    }
+}
+
 module.exports = {
-    index,
-    newOrder,
+    deleteOrder,
     confirmOrder,
     confirmPayment,
+    index,
+    newOrder,
 }
 

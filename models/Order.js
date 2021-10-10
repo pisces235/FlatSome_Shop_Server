@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const mongooseDelete = require('mongoose-delete')
 
 const Order = mongoose.Schema({
     name: {
@@ -43,11 +42,5 @@ const Order = mongoose.Schema({
         required:true
     }
 }, { timestamps: true });
-
-// Add plugins
-Order.plugin(mongooseDelete, {
-    deletedAt: true,
-    overrideMethods: 'all'
-})
 
 module.exports = mongoose.model("Order", Order)

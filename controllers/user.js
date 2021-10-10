@@ -28,6 +28,17 @@ const authFacebook = async (req, res, next) => {
     return res.status(200).json({ access: true })
 }
 
+const changePassword = async (req, res, next) => {
+    const {id} = req.params
+
+    let user = await User.findById(id)
+    user.password = req.body.password
+    
+    await user.save()
+
+    return res.status(200).json({success: true})
+}
+
 const getUser = async (req, res, next) => {
     const { userID } = req.value.params
 
@@ -158,6 +169,7 @@ const updateUserAddress = async (req, res, next) => {
 module.exports = {
     authGoogle,
     authFacebook,
+    changePassword,
     getUser,
     index,
     newUser,
