@@ -37,6 +37,10 @@ const Order = mongoose.Schema({
         type: String,
         default: '',
     },
+    createdDate: {
+        type: String,
+        default: '',
+    },
     total: { 
         type: Number, 
         required:true

@@ -5,8 +5,14 @@ const Product = require('../models/Product')
 //[DELETE]
 const deleteOrder = async (req, res, next) => {
     const { id, email } = req.params
-    console.log(email)
     let user = await User.findOne({ email: email })
+    let order = await Order.findById(id)
+    order.cart.forEach(async (cart) => {
+        let product = await Product.findById(cart.product._id)
+        product.stock += cart.quantity
+        product.sold -= cart.quantity
+        product.save()
+    })
     for(var i = 0; i < user.orders.length; i++) {
         if(user.orders[i]._id == id) {
             user.orders.splice(i, 1)
@@ -102,9 +108,32 @@ const index = async (req, res, next) => {
 }
 // [POST]
 const newOrder = async (req, res, next) => {
+    let date = new Date()
+    let day = date.getDate()
+    let indexMonth = date.getMonth()
+    let year = date.getFullYear()
+    let month = [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+    ]
+    let createdDate = day + "/" + month[indexMonth] + "/" + year
     try {
-        const newOrder = new Order(req.body)
-
+        const newOrder = new Order({
+            ...req.body,
+            createdDate: createdDate
+        })
+        console.log(newOrder)
+        
         newOrder.cart.forEach(async c => {
             let product = await Product.findById(c.product._id)
 
