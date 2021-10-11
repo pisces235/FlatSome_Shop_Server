@@ -78,7 +78,6 @@ const confirmPayment = async (req, res, next) => {
     order.confirm = true
     order.payment = true
     order.paymentDate = paymentDate
-    console.log(order)
 
     let user = await User.findOne({email: order.email})
 
