@@ -1,5 +1,22 @@
 const Product = require('../models/Product')
 
+// [PATCH]
+const addReview = async (req, res, next) => {
+    const { slug } = req.params
+
+    let newReview = req.body
+
+    let product = await Product.findOne({ slug: slug})
+    
+    product.reviews.push(newReview)
+
+    console.log(product.reviews)
+
+    product.save()
+
+    res.status(200).json({ success: true })
+}
+
 // [DELETE]
 const deleteProduct = async (req, res, next) => {
     Product.deleteOne({ slug: req.params.slug })
@@ -101,6 +118,7 @@ const updateProduct = async (req, res, next) => {
 }
 
 module.exports = {
+    addReview,
     deleteProduct,
     deletedProducts,
     getProduct,

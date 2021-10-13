@@ -20,5 +20,7 @@ router.route('/:slug')
     .delete(ProductController.trashProduct)
 router.route('/:slug/force')
     .delete(ProductController.deleteProduct)
+router.route('/:slug/addreview')
+    .patch(ProductController.addReview)
 
 module.exports = router
