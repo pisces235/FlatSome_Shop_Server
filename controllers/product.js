@@ -102,11 +102,17 @@ const updateProduct = async (req, res, next) => {
 
     let newProduct = req.body
 
-    
+    let cs = []
+
     s = newProduct.categories.toString().split(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/ ]/gi)
-    var filtered = s.filter(function (el) {
+    s.forEach(c => {
+        var result = c.charAt(0).toUpperCase() + c.slice(1)
+        cs.push(result)
+    })
+    var filtered = cs.filter(function (el) {
         return el != "";
       });
+    console.log(filtered)
     Product.updateOne({ slug: slug }, {
         ...newProduct,
         categories: filtered
