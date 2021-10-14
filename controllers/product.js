@@ -10,8 +10,6 @@ const addReview = async (req, res, next) => {
     
     product.reviews.push(newReview)
 
-    console.log(product.reviews)
-
     product.save()
 
     res.status(200).json({ success: true })
